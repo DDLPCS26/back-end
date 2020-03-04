@@ -17,6 +17,7 @@ class Room:
         self.w_to = None
         self.x = x
         self.y = y
+        
     def __repr__(self):
         if self.e_to is not None:
             return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
@@ -157,9 +158,9 @@ class World:
 
 
 w = World()
-num_rooms = 100
-width = 10
-height = 10
+num_rooms = 144
+width = 12
+height = 12
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 

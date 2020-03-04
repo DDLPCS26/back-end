@@ -7,7 +7,7 @@ Room.objects.all().delete()
 
 cache = {}
 
-for row in world.grid:
+for row in w.grid:
     for r in row:
             room = Room(title = r.name, description = f'Welcome to the {j.name} room with id {r.id}', x = r.x, y = r.y)
             room.save()

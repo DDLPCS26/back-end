@@ -23,10 +23,9 @@ def initialize(request):
     return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players}, safe=True)
 
 
-#@csrf_exempt
+# @csrf_exempt
 @api_view(["POST"])
 def move(request):
-    print(request.data)
     dirs={"n": "north", "s": "south", "e": "east", "w": "west"}
     reverse_dirs = {"n": "south", "s": "north", "e": "west", "w": "east"}
     player = request.user.player
@@ -66,6 +65,7 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error':"Not yet implemented"}, safe=True, status=500)
+
 
 #implementing GET - You will also need to implement a GET rooms API endpoint for clients to fetch all rooms to display a map on the frontend.
 @csrf_exempt

@@ -11,10 +11,28 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-from decouple import config
+# from decouple import config
+
+import logging
+
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+logger = logging.getLogger(__name__)
+
+# Set casting/default values for environment configuration variables
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+# Try to read .env file, if it's not present, assume that application
+# is deployed to production and skip reading the file
+try:
+    environ.Env.read_env(env_file=f"{BASE_DIR}/.env")
+    logger.info("Successfully read .env file")
+except UserWarning:
+    logger.info("Application is in production, skipping .env import")
 
 
 # Quick-start development settings - unsuitable for production
@@ -150,5 +168,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-import django_heroku
-django_heroku.settings(locals())
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+

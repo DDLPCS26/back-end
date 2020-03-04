@@ -97,7 +97,7 @@ class World:
             room_count += 1
 
             if rows_created < y and random_room_create[y-1] == x:
-                room_before = self.gris[y-1][x]
+                room_before = self.grid[y-1][x]
                 room_before.connect_rooms(room, 'n')
                 rows_created += 1
 

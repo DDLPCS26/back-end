@@ -8,13 +8,13 @@ Room.objects.all().delete()
 cache = {}
 
 for row in world.grid:
-      for r in row:
+    for r in row:
             room = Room(title = r.name, description = f'Welcome to the {j.name} room with id {r.id}', x = r.x, y = r.y)
             room.save()
             cache[(r.x, r.y)] = room
             if (r.e_to.x, r.e_to.y) in cache:
-                  room.connectRooms(cache[(r.e_to.x, r.e_to.y)], 'e')
-                  cache[(r.e_to.x, r.e_to.y)].connectRooms(room, 'w')
+                room.connectRooms(cache[(r.e_to.x, r.e_to.y)], 'e')
+                cache[(r.e_to.x, r.e_to.y)].connectRooms(room, 'w')
     if r.w_to != None:
         if (r.w_to.x, r.w_to.y) in cache:
             room.connectRooms(cache[(r.w_to.x, r.w_to.y)], 'w')
@@ -65,9 +65,9 @@ for row in world.grid:
 # r_narrow.connectRooms(r_treasure, "n")
 # r_treasure.connectRooms(r_narrow, "s")
 
-room_one = world.grid[0][0]
+room_one = w.grid[0][0]
 players=Player.objects.all()
 for p in players:
-  p.currentRoom=r_outside.id
-  p.save()
+    p.currentRoom=r_outside.id
+    p.save()
 

@@ -4,7 +4,7 @@
 # You can modify generate_rooms() to create your own
 # procedural generation algorithm and use print_rooms()
 # to see the world.
-
+from random import randint
 
 class Room:
     def __init__(self, id, name, description, x, y):
@@ -17,6 +17,7 @@ class Room:
         self.w_to = None
         self.x = x
         self.y = y
+        
     def __repr__(self):
         if self.e_to is not None:
             return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
@@ -64,6 +65,8 @@ class World:
 
         # While there are rooms to be created...
         previous_room = None
+        rows_created = 0
+        random_room_create = [randint(0,9) for _ in range(size_x - 1)]
         while room_count < num_rooms:
 
             # Calculate the direction of the room to be created
@@ -94,7 +97,10 @@ class World:
             previous_room = room
             room_count += 1
 
-
+            if rows_created < y and random_room_create[y-1] == x:
+                room_before = self.grid[y-1][x]
+                room_before.connect_rooms(room, 'n')
+                rows_created += 1
 
     def print_rooms(self):
         '''
@@ -152,9 +158,9 @@ class World:
 
 
 w = World()
-num_rooms = 44
-width = 8
-height = 7
+num_rooms = 144
+width = 12
+height = 12
 w.generate_rooms(width, height, num_rooms)
 w.print_rooms()
 

@@ -65,3 +65,25 @@ def move(request):
 def say(request):
     # IMPLEMENT
     return JsonResponse({'error':"Not yet implemented"}, safe=True, status=500)
+
+
+#implementing GET - You will also need to implement a GET rooms API endpoint for clients to fetch all rooms to display a map on the frontend.
+@csrf_exempt
+@api_view(["GET"])
+def rooms(request):
+    user = request.user
+    player = user.player
+    player_id = player.id
+    rooms = Room.objects.all()
+    return JsonResponse([{
+        'room_id': room.id,
+        'north': room.n_to != 0,
+        'south': room.s_to != 0,
+        'east': room.e_to != 0,
+        'west': room.w_to != 0,
+        'title': room.title,
+        #'x_location': room.x,
+        #'y_location': room.y,
+        'description': room.description,
+        #'players': room.allPlayerNames(player_id)
+    } for room in rooms], safe=False)

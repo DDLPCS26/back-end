@@ -20,7 +20,7 @@ def initialize(request):
     uuid = player.uuid
     room = player.room()
     players = room.playerNames(player_id)
-    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players}, safe=True)
+    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description,'room_id': room.id, 'players':players}, safe=True)
 
 
 # @csrf_exempt
@@ -54,10 +54,10 @@ def move(request):
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         # for p_uuid in nextPlayerUUIDs:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'players':players, 'error_msg':""}, safe=True)
+        return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'players':players, 'room_id': room.id, 'error_msg':""}, safe=True)
     else:
         players = room.playerNames(player_id)
-        return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players, 'error_msg':"You cannot move that way."}, safe=True)
+        return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players, 'room_id': room.id, 'error_msg':"You cannot move that way."}, safe=True)
 
 
 @csrf_exempt
@@ -82,8 +82,8 @@ def rooms(request):
         'east': room.e_to != 0,
         'west': room.w_to != 0,
         'title': room.title,
-        #'x_location': room.x,
-        #'y_location': room.y,
+        'y_coor': room.y,
+        'x_coor': room.x,
         'description': room.description,
-        #'players': room.allPlayerNames(player_id)
-    } for room in rooms], safe=False)
+        'players': room.playerNames(player_id)
+    } for  room in rooms], safe=False)

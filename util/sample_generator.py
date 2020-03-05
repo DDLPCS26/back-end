@@ -4,7 +4,10 @@
 # You can modify generate_rooms() to create your own
 # procedural generation algorithm and use print_rooms()
 # to see the world.
-from random import randint
+from random
+n = open('./util/randoms.txt', 'r', encoding='utf-8')
+names = n.read().split("\n")
+n.close()
 
 class Room:
     def __init__(self, id, name, description, x, y):
@@ -36,13 +39,68 @@ class Room:
         '''
         return getattr(self, f"{direction}_to")
 
+    def branch_rooms(grid,
+                    current_location,
+                    current_room,
+                    current_rooms,
+                    max_rooms,
+                    max_width,
+                    max_height,
+                    branch_from
+                ):
+
+    north = current_location.copy()
+    north[1] += 1
+    north += ['n']
+    east = current_location.copy()
+    east[0] += 1
+    east += ['e']
+    south = current_location.copy()
+    south[1] -= 1
+    south += ['s']
+    west = current_location.copy()
+    west[0] -= 1
+    west += ['w']
+
+    possible_next = [north, east, south, west]
+
+    global names
+
+    for room in possible_next:
+        # passes if room is out of bounds
+        if (room[0] < 0) or (room[1] < 0) or (room[0] > max_width - 1) or (room[1] > max_height - 1):  # noqa
+            pass
+
+        # passes if room already exists in grid
+        elif grid[room[0]][room[1]] is not None:
+            pass
+
+        # creates new room at given location otherwise
+        else:
+            if current_rooms == max_rooms:
+                pass
+            else:
+                current_rooms += 1
+                name = random.choice(names)
+                new_room = Room(current_rooms,
+                                f'{name}',
+                                f'Just a generic room named {name}',
+                                room[0],
+                                room[1]
+                                )
+                current_room.connect_rooms(new_room, room[2])
+                grid[room[0]][room[1]] = new_room
+                branch_from.append(new_room)
+
+    return(grid, current_rooms, branch_from)
+
 
 class World:
     def __init__(self):
         self.grid = None
         self.width = 0
         self.height = 0
-    def generate_rooms(self, size_x, size_y, num_rooms):
+    def generate_zz(self, size_x, size_y, num_rooms):
         '''
         Fill up the grid, bottom to top, in a zig-zag pattern
         '''
@@ -65,8 +123,8 @@ class World:
 
         # While there are rooms to be created...
         previous_room = None
-        rows_created = 0
-        random_room_create = [randint(0,9) for _ in range(size_x - 1)]
+        #rows_created = 0
+        #random_room_create = [randint(0,9) for _ in range(size_x - 1)]
         while room_count < num_rooms:
 
             # Calculate the direction of the room to be created
@@ -83,6 +141,8 @@ class World:
                 direction *= -1
 
             # Create a room in the given direction
+            global names
+            global count_nums
             room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
             # Note that in Django, you'll need to save the room after you create it
 
@@ -97,10 +157,43 @@ class World:
             previous_room = room
             room_count += 1
 
-            if rows_created < y and random_room_create[y-1] == x:
-                room_before = self.grid[y-1][x]
-                room_before.connect_rooms(room, 'n')
-                rows_created += 1
+            # if rows_created < y and random_room_create[y-1] == x:
+            #     room_before = self.grid[y-1][x]
+            #     room_before.connect_rooms(room, 'n')
+            #     rows_created += 1
+    def generate_rooms(self, width, height, num_rooms):
+        # sets grid and size
+        self.grid = [None] * width
+        self.width = width
+        self.height = height
+        for i in range(len(self.grid)):
+            self.grid[i] = [None] * height
+
+        # creates the starting room at bottom left
+        start_room = Room(1, 'START ROOM', "This is the starting room", 0, 0)
+        self.grid[0][0] = start_room
+        current_rooms = 1
+        current_location = [0, 0]
+
+        current_room = start_room
+        max_rooms = 144
+        branch_from = []
+
+        while current_rooms < max_rooms:
+    
+            self.grid, current_rooms, branch_from = branch_rooms(self.grid,
+                current_location, 
+                current_room,
+                current_rooms,
+                max_rooms,
+                self.width,
+                self.height,
+                branch_from)
+            if branch_from:
+                current_room = branch_from.pop(random.randrange(len(branch_from)))  
+                current_location = [current_room.x, current_room.y]
+            else:
+                break
 
     def print_rooms(self):
         '''

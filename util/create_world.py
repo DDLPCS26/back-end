@@ -3,7 +3,9 @@ from adventure.models import Player, Room
 from util.sample_generator import World
 
 
-Room.objects.all().delete()
+#Room.objects.all().delete()
+world = World()
+world.generate_rooms(12, 12, 144)
 
 cache = {}
 
@@ -65,9 +67,9 @@ for row in w.grid:
 # r_narrow.connectRooms(r_treasure, "n")
 # r_treasure.connectRooms(r_narrow, "s")
 
-room_one = w.grid[0][0]
-players=Player.objects.all()
+players = Player.objects.all()
+first_room = world.grid[0][0]
 for p in players:
-    p.currentRoom=r_outside.id
+    p.currentRoom = first_room.id
     p.save()
 

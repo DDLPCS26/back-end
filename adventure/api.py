@@ -100,7 +100,7 @@ def rooms(request):
     room_data = []
 
     for room in rooms:
-        room_info.append(
+        room_data.append(
             {"id": room.id, "title": room.title, "description": room.description, "north": room.n_to, "east": room.e_to, "south": room.s_to, "west": room.w_to, "x": room.x_c, "y": room.y_c}
         )
     return JsonResponse({'num_rooms': len(room_data), 'rooms': room_data}, safe=True)

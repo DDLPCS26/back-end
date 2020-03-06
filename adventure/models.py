@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 import uuid
 
 class Room(models.Model):
-    room_id = models.IntegerField(primary_key=True, default=0)
+    id = models.IntegerField(primary_key=True, default=0)
     title = models.CharField(max_length=50, default="DEFAULT TITLE")
     description = models.CharField(max_length=500, default="DEFAULT DESCRIPTION")
     n_to = models.IntegerField(default=0)
@@ -19,7 +19,7 @@ class Room(models.Model):
     def connectRooms(self, destinationRoom, direction):
         destinationRoomID = destinationRoom.id
         try:
-            destinationRoom = Room.objects.get(room_id=destinationRoomID)
+            destinationRoom = Room.objects.get(id=destinationRoomID)
         except Room.DoesNotExist:
             print("That room does not exist")
         else:
@@ -37,10 +37,10 @@ class Room(models.Model):
             self.save()
 
     def playerNames(self, currentPlayerID):
-        return [p.user.username for p in Player.objects.filter(currentRoom=self.room_id) if p.id != int(currentPlayerID)]
+        return [p.user.username for p in Player.objects.filter(currentRoom=self.id) if p.id != int(currentPlayerID)]
 
     def playerUUIDs(self, currentPlayerID):
-        return [p.uuid for p in Player.objects.filter(currentRoom=self.room_id) if p.id != int(currentPlayerID)]
+        return [p.uuid for p in Player.objects.filter(currentRoom=self.id) if p.id != int(currentPlayerID)]
 
 
 class Player(models.Model):
@@ -49,12 +49,12 @@ class Player(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     def initialize(self):
         if self.currentRoom == 0:
-            self.currentRoom = Room.objects.first().room_id
+            self.currentRoom = Room.objects.first().id
             self.save()
     def room(self):
         try:
             print("")
-            return Room.objects.get(room_id=self.currentRoom)
+            return Room.objects.get(id=self.currentRoom)
         except Room.DoesNotExist:
             self.initialize()
             return self.room()

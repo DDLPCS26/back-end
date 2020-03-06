@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
 import json
+from .room_creator from RoomCreator
 
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -14,6 +15,13 @@ import json
 @csrf_exempt
 @api_view(["GET"])
 def initialize(request):
+    Room.objects.all().delete()
+    created_rooms = RoomCreator()
+
+    num_rooms = 144
+    width = 12
+    height = 12
+    created_rooms.generate_rooms(width, height, num_rooms)
     user = request.user
     print(f"User: {user}")
     player = user.player
@@ -21,7 +29,9 @@ def initialize(request):
     player_id = player.id
     print(f"Player ID: {player_id}")
     uuid = player.uuid
-    room = player.room()
+
+    player.current_room = Room.objects.first().id
+    room = Room.objects.first()
     players = room.playerNames(player_id)
     return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description,'room_id': room.room_id, 'players':players}, safe=True)
 
@@ -50,6 +60,15 @@ def move(request):
         nextRoom = Room.objects.get(id=nextRoomID)
         player.currentRoom=nextRoomID
         player.save()
+
+        ##
+        description = nextRoom.description
+        if player.hasVisited(nextRoom) and nextRoom.description_b:
+            description = nextRoom.description_b
+        if not player.hasVisited(nextRoom):
+            PlayerVisited.objects.create(player=player, room=room)
+
+
         players = nextRoom.playerNames(player_id)
         currentPlayerUUIDs = room.playerUUIDs(player_id)
         nextPlayerUUIDs = nextRoom.playerUUIDs(player_id)
@@ -57,10 +76,10 @@ def move(request):
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has walked {dirs[direction]}.'})
         # for p_uuid in nextPlayerUUIDs:
         #     pusher.trigger(f'p-channel-{p_uuid}', u'broadcast', {'message':f'{player.user.username} has entered from the {reverse_dirs[direction]}.'})
-        return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'players':players, 'room_id': room.id, 'error_msg':""}, safe=True)
+        return JsonResponse({'name':player.user.username, 'title':nextRoom.title, 'description':nextRoom.description, 'players':players, 'error_msg':""}, safe=True)
     else:
         players = room.playerNames(player_id)
-        return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players, 'room_id': room.id, 'error_msg':"You cannot move that way."}, safe=True)
+        return JsonResponse({'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players, 'error_msg':"You cannot move that way."}, safe=True)
 
 
 @csrf_exempt
@@ -74,22 +93,29 @@ def say(request):
 @csrf_exempt
 @api_view(["GET"])
 def rooms(request):
-    user = request.user
-    player = user.player
-    player_id = player.id
+    #user = request.user
+    #player = user.player
+    #player_id = player.id
     rooms = Room.objects.all()
-    return JsonResponse([{
-        'room_id': room.id,
-        'north': room.n_to != 0,
-        'south': room.s_to != 0,
-        'east': room.e_to != 0,
-        'west': room.w_to != 0,
-        'title': room.title,
-        'y_coor': room.y,
-        'x_coor': room.x,
-        'description': room.description,
-        'players': room.playerNames(player_id)
-    } for  room in rooms], safe=False)
+    room_info = []
+
+    for room in rooms:
+        room_info.append(
+            {"id": room.id, "title": room.title, "description": room.description, "north": room.n_to, "east": room.e_to, "south": room.s_to, "west": room.w_to, "x": room.x, "y": room.y}
+        )
+    return JsonResponse({'num_rooms': len(room_data), 'rooms': room_data}, safe=True)
+    # return JsonResponse([{
+    #     'room_id': room.id,
+    #     'north': room.n_to != 0,
+    #     'south': room.s_to != 0,
+    #     'east': room.e_to != 0,
+    #     'west': room.w_to != 0,
+    #     'title': room.title,
+    #     'y_coor': room.y,
+    #     'x_coor': room.x,
+    #     'description': room.description,
+    #     'players': room.playerNames(player_id)
+    # } for  room in rooms], safe=False)
 
 
 # @csrf_exempt

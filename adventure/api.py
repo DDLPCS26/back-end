@@ -15,12 +15,15 @@ import json
 @api_view(["GET"])
 def initialize(request):
     user = request.user
+    print(f"User: {user}")
     player = user.player
+    print(f"Player: {player}")
     player_id = player.id
+    print(f"Player ID: {player_id}")
     uuid = player.uuid
     room = player.room()
     players = room.playerNames(player_id)
-    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description,'room_id': room.id, 'players':players}, safe=True)
+    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description,'room_id': room.room_id, 'players':players}, safe=True)
 
 
 # @csrf_exempt
@@ -87,3 +90,14 @@ def rooms(request):
         'description': room.description,
         'players': room.playerNames(player_id)
     } for  room in rooms], safe=False)
+
+
+# @csrf_exempt
+@api_view(["POST"])
+def createworld(request):
+    w = World()
+    num_rooms = 144
+    width = 12
+    height = 12
+    w.generate_rooms(width, height, num_rooms)
+    w.print_rooms()

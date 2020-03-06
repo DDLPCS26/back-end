@@ -1,14 +1,13 @@
 from .models import Room
+import random
 # Sample Python code that can be used to generate rooms in
 # a zig-zag pattern.
 #
 # You can modify generate_rooms() to create your own
 # procedural generation algorithm and use print_rooms()
 # to see the world.
-import random
 
-
-class RoomCreator:
+class World:
     def __init__(self):
         self.grid = None
         self.width = 0
@@ -40,7 +39,7 @@ class RoomCreator:
 
             # Calculate the direction of the room to be created
             if direction > 0 and x < size_x - 1:
-                room_direction = "e"
+                room_direction = "e" 
                 x += 1
             elif direction < 0 and x > 0:
                 room_direction = "w"
@@ -52,8 +51,8 @@ class RoomCreator:
                 direction *= -1
 
             # Create a room in the given direction
-            room = Room(title=f"Room#{room_count}",
-                        description="A Generic Room ROOM_GEN", x_c=x, y_c=y)
+            room = Room(title=f"Room {room_count}",
+                        description="A Generic Room ROOM_GEN", x_coor=x, y_coor=y)
             room.save()
             # Note that in Django, you'll need to save the room after you create it
 

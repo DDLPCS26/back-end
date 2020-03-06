@@ -8,7 +8,7 @@ from .models import Room
 import random
 
 
-class RoomGenerator:
+class RoomCreator:
     def __init__(self):
         self.grid = None
         self.width = 0

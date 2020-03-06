@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from .models import *
 from rest_framework.decorators import api_view
 import json
-from .room_creator from RoomCreator
+from .room_creator import RoomCreator
 
 # instantiate pusher
 # pusher = Pusher(app_id=config('PUSHER_APP_ID'), key=config('PUSHER_KEY'), secret=config('PUSHER_SECRET'), cluster=config('PUSHER_CLUSTER'))
@@ -33,7 +33,7 @@ def initialize(request):
     player.current_room = Room.objects.first().id
     room = Room.objects.first()
     players = room.playerNames(player_id)
-    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description,'room_id': room.room_id, 'players':players}, safe=True)
+    return JsonResponse({'uuid': uuid, 'name':player.user.username, 'title':room.title, 'description':room.description, 'players':players}, safe=True)
 
 
 # @csrf_exempt
@@ -97,11 +97,11 @@ def rooms(request):
     #player = user.player
     #player_id = player.id
     rooms = Room.objects.all()
-    room_info = []
+    room_data = []
 
     for room in rooms:
         room_info.append(
-            {"id": room.id, "title": room.title, "description": room.description, "north": room.n_to, "east": room.e_to, "south": room.s_to, "west": room.w_to, "x": room.x, "y": room.y}
+            {"id": room.id, "title": room.title, "description": room.description, "north": room.n_to, "east": room.e_to, "south": room.s_to, "west": room.w_to, "x": room.x_c, "y": room.y_c}
         )
     return JsonResponse({'num_rooms': len(room_data), 'rooms': room_data}, safe=True)
     # return JsonResponse([{
